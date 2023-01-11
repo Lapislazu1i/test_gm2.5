@@ -140,11 +140,50 @@ int test4()
     printf("unp: %s, len: %d\n", pad, unplen);
 }
 
+int test5()
+{
+    int ret = 0;
+    int inSize = 1024;
+    unsigned char iv[16];
+    unsigned char iv1[16];
+    unsigned char iv2[16];
+    unsigned char key[16];
+    for(int i = 0; i < 16; ++i) {
+        iv[i] = 'a';
+        iv1[i] = 'a';
+        iv2[i] = 'a';
+        key[i] = 'a';
+    }
+    unsigned char* in = new unsigned char[inSize];
+    for(int i = 0; i < 32; ++i) {
+        in[i] = 'a';
+    }
+    int enSize = 1024;
+    int enLen = 0;
+    unsigned char* en = new unsigned char[enSize];
+
+    int outSize = 1024;
+    int outLen = 0;
+    unsigned char* out = new unsigned char[outSize];
+
+    sms4_key_t enkey;
+    sms4_key_t dekey;
+    sms4_set_encrypt_key(&enkey, key);
+    sms4_set_decrypt_key(&dekey, key);
+
+    int num = 0;
+    sms4_ecb_encrypt(in, en, &enkey, 1);
+    sms4_ecb_encrypt(en, out, &dekey, 0);
+    printf("de: %s\n", out);
+    return ret;
+
+}
+
 
 int main()
 {
     int ret = 0;
-    ret = test3();
+    ret = test5();
     void (*abc)();
     std::string in;
     int a = 127;

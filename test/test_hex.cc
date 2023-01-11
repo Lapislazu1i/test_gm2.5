@@ -102,15 +102,19 @@ int test2()
     free(enc);
     return 0;
 }
-int main()
+int main(int argc, char** argv)
 {
-    int ret = 0;
-    ret = test2();
+    // int ret = 0;
+    // ret = test2();
 
-    const  char* in = "15z";
+    // const  char* in = "15z";
 
-    int a = (*in >> 2) & 0xf;
-    a = 47;
-    printf("%d, %x\n", a, a);
-    printf("str: %s\n", in);
+    // int a = (*in >> 2) & 0xf;
+    // a = 47;
+    // printf("%d, %x\n", a, a);
+    // printf("str: %s\n", in);
+    printf("argc: %d\n", argc);
+    for(int i = 0; i < argc; ++i) {
+        printf("%s\n", argv[i]);
+    }
 }

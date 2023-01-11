@@ -25,21 +25,25 @@ unsigned char* get_32key()
 
 int test1()
 {
-    unsigned char* key = get_16key();
+    unsigned char* key = get_32key();
     unsigned char* iv = get_16key();
     unsigned char* iv1 = get_16key();
     unsigned char* in =  get_16key();
     size_t inlen = strlen((char*)in);
-    const char* in1 = "asds";
-    size_t inlen1 = strlen(in1);
-    unsigned char* en =  new unsigned char[32]();
-    unsigned char* de =  new unsigned char[32]();
+    unsigned char* in1 = new unsigned char[1024]();
+    for(int i = 0; i < 1; ++i) {
+        in1[i] = 'a';
+    }
+    size_t inlen1 = strlen((char*)in1);
+    unsigned char* en =  new unsigned char[1024]();
+    unsigned char* de =  new unsigned char[1024]();
     AES_KEY enkey;
     AES_KEY dekey;
-    AES_set_encrypt_key(key, 128, &enkey);
-    AES_set_decrypt_key(key, 128, &dekey);
+    AES_set_encrypt_key(key, 256, &enkey);
+    AES_set_decrypt_key(key, 256, &dekey);
     AES_cbc_encrypt((const unsigned char*)in1, en, inlen1, &enkey, iv, 1);
-    AES_cbc_encrypt((const unsigned char*)en, de, inlen, &dekey, iv1, 0);
+    printf("en: %s, len: %ld\n", en, strlen((char*)en));
+    AES_cbc_encrypt((const unsigned char*)en, de, inlen1, &dekey, iv1, 0);
     printf("de: %s, len: %ld\n", de, strlen((char*)de));
 
     
@@ -53,8 +57,12 @@ int test2()
     unsigned char* iv1 = get_16key();
     unsigned char* in =  get_32key();
     size_t inlen = strlen((char*)in);
-    const char* in1 = "8cc72b05705d5c46f412af8cbed55aad1asas";
-    size_t inlen1 = strlen(in1);
+
+    unsigned char* in1 = new unsigned char[1024]();
+    for(int i = 0; i < 20; ++i) {
+        in1[i] = 'a';
+    }
+    size_t inlen1 = strlen((char*)in1);
     unsigned char* en =  new unsigned char[2048]();
     unsigned char* de =  new unsigned char[2048]();
     AES_KEY enkey;
@@ -70,7 +78,7 @@ int test2()
     return 0;
 }
 
-int test3()
+int testofb()
 {
     int ret = 0;
     unsigned char* key = get_16key();
@@ -78,10 +86,14 @@ int test3()
     unsigned char* iv1 = get_16key();
     unsigned char* in =  get_16key();
     size_t inlen = strlen((char*)in);
-    const char* in1 = "asdsasdsasdsasds";
-    size_t inlen1 = strlen(in1);
-    unsigned char* en =  new unsigned char[32]();
-    unsigned char* de =  new unsigned char[32]();
+
+    unsigned char* in1 = new unsigned char[1024]();
+    for(int i = 0; i < 10; ++i) {
+        in1[i] = 'a';
+    }
+    size_t inlen1 = strlen((char*)in1);
+    unsigned char* en =  new unsigned char[1024]();
+    unsigned char* de =  new unsigned char[1024]();
     AES_KEY enkey;
     AES_KEY dekey;
     ret = AES_set_encrypt_key(key, 128, &enkey);
@@ -89,7 +101,7 @@ int test3()
     int num  = 0 ;
     AES_ofb128_encrypt((const unsigned char*)in1, en, inlen1, &enkey, iv, &num);
     printf("en: %s, len: %ld\n", en, strlen((char*)en));
-    AES_ofb128_encrypt((const unsigned char*)en, de, inlen, &enkey, iv1, &num);
+    AES_ofb128_encrypt((const unsigned char*)en, de, inlen1, &enkey, iv1, &num);
     printf("de: %s, len: %ld\n", de, strlen((char*)de));
 
     
@@ -172,16 +184,16 @@ int test6()
     unsigned char* iv1 = get_16key();
     unsigned char* in =  get_32key();
     size_t inlen = strlen((char*)in);
-    char* in1 = new char[4069]();
-    for(int i = 0; i < 256; ++i) {
+    unsigned char* in1 = new unsigned char[4069]();
+    for(int i = 0; i < 1; ++i) {
         in1[i] = 'a';
     }
-    size_t inlen1 = strlen(in1);
+    size_t inlen1 = strlen((char*)in1);
     unsigned char* en =  new unsigned char[2048]();
     unsigned char* de =  new unsigned char[2048]();
 
-    const EVP_CIPHER * evpcipher =EVP_get_cipherbyname("aes-128-ecb");
-     const EVP_CIPHER * evpcipher1 =EVP_get_cipherbyname("aes-128-ecb");
+    const EVP_CIPHER * evpcipher =EVP_get_cipherbyname("aes-128-cbc");
+    const EVP_CIPHER * evpcipher1 =EVP_get_cipherbyname("aes-128-cbc");
     EVP_CIPHER_CTX  * evpctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX  * evpctx1 = EVP_CIPHER_CTX_new();
     int outl = 0;
@@ -189,16 +201,16 @@ int test6()
     
     EVP_EncryptInit_ex(evpctx, evpcipher, NULL, key, iv);
     EVP_CIPHER_CTX_set_padding(evpctx, 0);
-    EVP_EncryptUpdate(evpctx, en, &outl, in, 16);
+    EVP_EncryptUpdate(evpctx, en, &outl, in1, inlen1);
     EVP_EncryptFinal_ex(evpctx, en, &outl);
     printf("en: %s, len: %d\n", en, outl);
 
 
     EVP_DecryptInit_ex(evpctx1, evpcipher, NULL, key, iv);
     EVP_CIPHER_CTX_set_padding(evpctx1, 0);
-    EVP_DecryptUpdate(evpctx1, de, &out2, en, 16);
+    EVP_DecryptUpdate(evpctx1, de, &out2, en, inlen1);
     EVP_DecryptFinal_ex(evpctx1, de, &out2);
-    printf("de: %s, len: %d\n", de, out2);
+    printf("de: %s, len: %d\n", de, strlen((char*)de));
 
 
     EVP_CIPHER_CTX_free(evpctx);

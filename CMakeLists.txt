@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 
-project(software_service_gm)
+project(test_gm)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
@@ -9,7 +9,7 @@ add_compile_options(-g -fPIC -Wimplicit-function-declaration)
 #设定编译参数
 set(CMAKE_BUILD_TYPE "Debug")
  
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 
 
@@ -36,22 +36,6 @@ link_directories("./lib")
  #设定源码列表.
 aux_source_directory("./src" SRC_FILES)
 
- 
-#生成动/静态库
-#add_library(动/静态链接库名称  SHARED/STATIC(可选，默认STATIC)  源码列表)
-#可以单独生成多个模块
- 
-#add_library(dnassl  SHARED  ${SRC_FILES} ${SRC_CERT_FILES})
-#生成可执行文件
-add_library(software_service_gm STATIC ${SRC_FILES} )
-target_compile_definitions(software_service_gm PRIVATE DEBUG ) 
- 
- 
-target_link_libraries(software_service_gm PRIVATE
-pthread
-m
-dl
-)#就是g++ 编译选项中-l后的内容，不要有多余空格
 
 
 enable_testing()
@@ -136,5 +120,15 @@ target_compile_options(test_sha PRIVATE -fpermissive)
 target_link_libraries(test_sha PRIVATE
 libcrypto.a
 libssl.a
+pthread
+dl)
+
+add_executable(test_ssl ./test/test_ssl.cc ${INCLUDE_FILES} ${SRC_FILES})
+
+target_compile_options(test_ssl PRIVATE )
+
+target_link_libraries(test_ssl PRIVATE
+libssl.a
+libcrypto.a
 pthread
 dl)
